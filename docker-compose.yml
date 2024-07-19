@@ -56,7 +56,6 @@ services:
       - config:/config
       - zigbee2mqtt:/config/zigbee2mqtt
       - esphome:/config/esphome
-      - frigate-config:/config/frigate
     user: root
 
   # https://hub.docker.com/_/influxdb
@@ -100,44 +99,9 @@ services:
       - influxdb:/volumes/influxdb
       - grafana:/volumes/grafana
       - zigbee2mqtt:/volumes/zigbee2mqtt
-      - frigate-media:/volumes/frigate-media
       - tailscale:/volumes/tailscale
       - netdatalib:/volumes/netdatalib
       - esphome:/volumes/esphome
-
-  # https://docs.frigate.video/frigate/installation
-  frigate:
-    image: ghcr.io/blakeblackshear/frigate:0.13.2@sha256:2906991ccad85035b176941f9dedfd35088ff710c39d45ef1baa9a49f2b16734
-    privileged: true
-    ports:
-      - "5000:5000"
-      - "1935:1935" # RTMP feeds
-    volumes:
-      - frigate-config:/config
-      - frigate-media:/media/frigate
-    tmpfs:
-      - /tmp/cache
-    shm_size: 2048M
-    environment:
-      FRIGATE_RTSP_PASSWORD: "balena"
-      CONFIG_FILE: "/config/config.yml"
-    labels:
-      io.balena.features.kernel-modules: 1
-    devices:
-      - /dev/dri:/dev/dri
-
-  # https://hub.docker.com/r/mrlt8/wyze-bridge/tags
-  wyze-bridge:
-    image: mrlt8/wyze-bridge:2.9.12@sha256:66bd66ac259f34fd1c15fe2ac89a69fc2f404f265fa460608bedf710af9883aa
-    ports:
-      # - 1935:1935 # RTMP
-      # - 8554:8554 # RTSP
-      # - 8888:8888 # HLS
-      # - 8889:8889 # WebRTC
-      # - 8189:8189/udp # WebRTC/ICE
-      - 5001:5000 # WEB-UI
-    volumes:
-      - wyze-tokens:/tokens
 
   # https://hub.docker.com/r/tailscale/tailscale
   # https://github.com/tailscale/tailscale/blob/main/cmd/containerboot/main.go
@@ -204,9 +168,6 @@ volumes:
   mqtt: {}
   zigbee2mqtt: {}
   duplicati: {}
-  frigate-config: {}
-  frigate-media: {}
-  wyze-tokens: {}
   tailscale: {}
   netdatalib: {}
   netdatacache: {}
